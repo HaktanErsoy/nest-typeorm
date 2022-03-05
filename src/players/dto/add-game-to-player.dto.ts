@@ -1,9 +1,9 @@
 import { IsString } from 'class-validator';
 
-export class CreateGameDto {
+export class AddGameToPlayerDto {
   @IsString()
-  name: string;
+  playerId: number;
 
   @IsString()
-  description: string;
+  gameId: number;
 }
