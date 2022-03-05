@@ -19,7 +19,6 @@ export class PlayersService {
   async create(createPlayerDto: CreatePlayerDto) {
     const newPlayer = this.playerRepository.create({
       name: createPlayerDto.name,
-      games: [],
     });
     await this.playerRepository.save(newPlayer);
     return newPlayer;
@@ -31,24 +30,28 @@ export class PlayersService {
     );
     const game = await this.gameRepository.findOne(AddGameToPlayerDto.gameId);
 
-    if (!player.games.includes(game)) {
-      player.games.push(game);
-    }
+    await this.playerRepository
+      .createQueryBuilder()
+      .relation(Player, 'games')
+      .of(player.id)
+      .add(game);
 
-    this.playerRepository.save(player);
-
-    return player;
+    return this.findOne(player.id);
   }
 
   findAll() {
     return this.playerRepository
       .createQueryBuilder('player')
-      .leftJoin('player.games', 'game')
+      .leftJoinAndSelect('player.games', 'game')
       .getMany();
   }
 
   findOne(id: number) {
-    return this.playerRepository.find({ id });
+    return this.playerRepository
+      .createQueryBuilder('player')
+      .leftJoinAndSelect('player.games', 'game')
+      .where('player.id = :id', { id })
+      .getOne();
   }
 
   update(id: number, updatePlayerDto: UpdatePlayerDto) {

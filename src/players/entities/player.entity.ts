@@ -15,11 +15,7 @@ export class Player {
   @Column()
   name: string;
 
-  @ManyToMany(() => Game, { cascade: true })
-  @JoinTable({
-    name: 'player_game',
-    joinColumn: { name: 'player_id', referencedColumnName: 'id' },
-    inverseJoinColumn: { name: 'game_id', referencedColumnName: 'id' },
-  })
+  @ManyToMany(() => Game)
+  @JoinTable()
   games!: Game[];
 }
